@@ -2782,6 +2782,7 @@ private:
     InputMediaStream_FFMPEG& operator =(const InputMediaStream_FFMPEG&);
 
     AVFormatContext* ctx_;
+    AVDictionary *dict;
     int video_stream_id_;
     AVPacket pkt_;
 
@@ -2794,6 +2795,9 @@ bool InputMediaStream_FFMPEG::open(const char* fileName, int* codec, int* chroma
 {
     int err;
 
+    printf("Adding config for rtsp_transport\n");
+
+    av_dict_set(&dict, "rtsp_transport", "tcp", 0);
     ctx_ = 0;
     video_stream_id_ = -1;
     memset(&pkt_, 0, sizeof(AVPacket));
@@ -2813,7 +2817,7 @@ bool InputMediaStream_FFMPEG::open(const char* fileName, int* codec, int* chroma
     #endif
 
     #if LIBAVFORMAT_BUILD >= CALC_FFMPEG_VERSION(53, 6, 0)
-        err = avformat_open_input(&ctx_, fileName, 0, 0);
+        err = avformat_open_input(&ctx_, fileName, NULL, &dict);
     #else
         err = av_open_input_file(&ctx_, fileName, 0, 0, 0);
     #endif
@@ -2869,6 +2873,7 @@ bool InputMediaStream_FFMPEG::open(const char* fileName, int* codec, int* chroma
             switch (enc->pix_fmt)
             {
             case AV_PIX_FMT_YUV420P:
+            case AV_PIX_FMT_YUVJ420P:
                 *chroma_format = ::VideoChromaFormat_YUV420;
                 break;
 
