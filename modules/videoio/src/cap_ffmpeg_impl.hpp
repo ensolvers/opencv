@@ -2782,7 +2782,7 @@ private:
     InputMediaStream_FFMPEG& operator =(const InputMediaStream_FFMPEG&);
 
     AVFormatContext* ctx_;
-    AVDictionary *dict;
+
     int video_stream_id_;
     AVPacket pkt_;
 
@@ -2796,8 +2796,11 @@ bool InputMediaStream_FFMPEG::open(const char* fileName, int* codec, int* chroma
     int err;
 
     printf("Adding config for rtsp_transport\n");
+    printf("New build\n");
 
+    AVDictionary* dict = NULL;
     av_dict_set(&dict, "rtsp_transport", "tcp", 0);
+
     ctx_ = 0;
     video_stream_id_ = -1;
     memset(&pkt_, 0, sizeof(AVPacket));
